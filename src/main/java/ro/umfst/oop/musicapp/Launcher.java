@@ -13,7 +13,7 @@ public class Launcher {
         public void start(Stage stage) throws IOException {
             FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("main-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 700, 600);
-            stage.setTitle("Zenei Toplisták");
+            stage.setTitle("Zenei Toplisták.");
             stage.setScene(scene);
             stage.show();
         }

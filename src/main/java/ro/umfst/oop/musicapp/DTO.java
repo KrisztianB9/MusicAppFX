@@ -1,31 +1,44 @@
 package ro.umfst.oop.musicapp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
-class ApiResponse {
-    @JsonProperty("tracks")
-    public Tracks tracks;
-}
 
-class Tracks {
-    @JsonProperty("track")
-    public List<Track> trackList;
-}
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class Track {
+        @JsonProperty("name")
+        private String name;
 
-class Track {
-    @JsonProperty("name")
-    public String name;
+        @JsonProperty("artist")
+        private Artist artist;
 
-    @JsonProperty("playcount")
-    public long playcount;
+        public String getName() { return name; }
+        public Artist getArtist() { return artist; }
+    }
 
-    @JsonProperty("artist")
-    public Artist artist;
-}
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class Artist {
+        @JsonProperty("name")
+        private String name;
 
-class Artist {
-    @JsonProperty("name")
-    public String name;
-}
+        public String getName() { return name; }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class Tracks {
+        @JsonProperty("track")
+        private List<Track> trackList;
+
+        public List<Track> getTrackList() { return trackList; }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class ApiResponse {
+        @JsonProperty("tracks")
+        private Tracks tracks;
+
+        public Tracks getTracks() { return tracks; }
+    }
+
+

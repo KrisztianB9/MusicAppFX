@@ -1,18 +1,23 @@
 package ro.umfst.oop.musicapp.controller;
-import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import ro.umfst.oop.musicapp.service.MusicService;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import ro.umfst.oop.musicapp.model.Song;
+import ro.umfst.oop.musicapp.service.MusicService;
 
 import java.util.List;
 
@@ -27,11 +32,14 @@ public class MusicController {
     @FXML
     private ProgressIndicator loadingIndicator;
 
-    private final MusicService musicService = new MusicService();
+    private MusicService musicService;
+
+    public MusicController() {
+        this.musicService = new MusicService();
+    }
 
     @FXML
     public void initialize() {
-        // Add the genres to the ChoiceBox
         genreChoiceBox.getItems().addAll("rnb", "rock", "hip-hop", "jazz", "80s");
 
         genreChoiceBox.getSelectionModel().selectedItemProperty().addListener(
@@ -48,12 +56,13 @@ public class MusicController {
 
     private void loadGenreSongs(String genre) {
         songHBox.getChildren().clear();
+        songHBox.setPadding(new Insets(10));
         loadingIndicator.setVisible(true);
 
-        Task<List<Song>> fetchTask = new Task<>() {
+        Task<List<Song>> fetchTask = new Task<List<Song>>() {
             @Override
             protected List<Song> call() throws Exception {
-                return musicService.fetchSongsByGenre(genre);
+                return musicService.getRankedPlaylists(List.of(genre));
             }
         };
 
@@ -62,11 +71,22 @@ public class MusicController {
             public void handle(WorkerStateEvent event) {
                 loadingIndicator.setVisible(false);
                 List<Song> songs = fetchTask.getValue();
+
+                List<String> backgroundColors = List.of(
+                        "#fff6e0",
+                        "#f9f9f9",
+                        "#fff0e6"
+                );
+
                 if (songs.isEmpty()) {
                     songHBox.getChildren().add(new Label("No songs found for this genre."));
                 } else {
-                    for (Song song : songs) {
-                        VBox songCard = createSongCard(song);
+                    for (int i = 0; i < songs.size(); i++) {
+                        Song song = songs.get(i);
+                        String color = (i < backgroundColors.size()) ? backgroundColors.get(i) : "#ffffff";
+
+                        VBox songCard = createSongCard(song, color);
+                        HBox.setMargin(songCard, new Insets(10));
                         songHBox.getChildren().add(songCard);
                     }
                 }
@@ -78,31 +98,59 @@ public class MusicController {
             public void handle(WorkerStateEvent event) {
                 loadingIndicator.setVisible(false);
                 songHBox.getChildren().add(new Label("Error: Could not load songs."));
-                fetchTask.getException().printStackTrace();
+                if (fetchTask.getException() != null) {
+                    fetchTask.getException().printStackTrace();
+                }
             }
         });
 
         new Thread(fetchTask).start();
     }
 
-    private VBox createSongCard(Song song) {
-        VBox card = new VBox(5); // 5px spacing
+    private VBox createSongCard(Song song, String backgroundColor) {
+        VBox card = new VBox(5);
+        card.setPrefWidth(180);
         card.setPadding(new Insets(10));
-        card.setStyle("-fx-border-color: #c0c0c0; -fx-border-width: 1; -fx-background-color: #ffffff; -fx-border-radius: 5;");
-        card.setPrefWidth(170); // Fixed width for each card in the HBox
-        card.setPrefHeight(100); // Fixed height
+
+        final String baseStyle = "-fx-background-color: " + backgroundColor + "; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-radius: 8; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0.5, 0, 2);";
+
+        final String hoverStyle = "-fx-background-color: " + backgroundColor + "; " +
+                "-fx-border-color: #cccccc; " +
+                "-fx-border-radius: 8; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0.6, 0, 4);";
+
+        card.setStyle(baseStyle);
+
+        card.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                card.setStyle(hoverStyle);
+            }
+        });
+        card.setOnMouseExited(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                card.setStyle(baseStyle);
+            }
+        });
 
         Label title = new Label(song.getTitle());
-        title.setStyle("-fx-font-weight: bold;");
-        title.setWrapText(true); // Allow title to wrap if too long
+        title.setFont(Font.font("System", FontWeight.BOLD, 14));
+        title.setWrapText(true);
 
         Label artist = new Label(song.getArtist());
+        artist.setFont(Font.font("System", 12));
         artist.setWrapText(true);
 
         Label plays = new Label(String.format("Plays: %,d", song.getStreamCount()));
-        plays.setStyle("-fx-font-size: 0.9em; -fx-text-fill: #555;");
+        plays.setFont(Font.font("System", 10));
+        plays.setStyle("-fx-text-fill: #666666;");
 
         card.getChildren().addAll(title, artist, plays);
         return card;
     }
 }
+

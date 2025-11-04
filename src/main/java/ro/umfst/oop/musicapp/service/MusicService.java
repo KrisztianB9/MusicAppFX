@@ -32,31 +32,24 @@ public class MusicService {
             allSongs.addAll(fetchSongsByGenre(genre));
         }
 
-        // We sort the songs here, as we only have one list
         allSongs.sort(Comparator.comparingLong(Song::getStreamCount).reversed());
 
         return allSongs;
     }
 
-    /**
-     * Step 1: Fetches the top 3 tracks for a given genre.
-     */
     public List<Song> fetchSongsByGenre(String genre) {
         List<Song> songList = new ArrayList<>();
 
         try {
-            // We use URLEncoder to safely handle genre names like "hip-hop"
             String encodedGenre = URLEncoder.encode(genre, StandardCharsets.UTF_8);
             String url = String.format("%s?method=tag.gettoptracks&tag=%s&api_key=%s&format=json&limit=3",
                     BASE_URL, encodedGenre, API_KEY);
 
             String jsonResponse = sendRequest(url);
 
-            // Parse the JSON response using our DTOs
             ApiResponse apiResponse = objectMapper.readValue(jsonResponse, ApiResponse.class);
 
             if (apiResponse != null && apiResponse.getTracks() != null) {
-                // Step 2: For each track found, get its detailed info (for the playcount)
                 for (Track track : apiResponse.getTracks().getTrackList()) {
                     try {
                         long playCount = fetchPlayCount(track.getArtist().getName(), track.getName());
@@ -78,11 +71,8 @@ public class MusicService {
         return songList;
     }
 
-    /**
-     * Step 2: Fetches the detailed info for a single track to get its playcount.
-     */
     private long fetchPlayCount(String artist, String trackName) throws Exception {
-        // Encode artist and track names for the URL
+
         String encodedArtist = URLEncoder.encode(artist, StandardCharsets.UTF_8);
         String encodedTrack = URLEncoder.encode(trackName, StandardCharsets.UTF_8);
 
@@ -91,18 +81,14 @@ public class MusicService {
 
         String jsonResponse = sendRequest(url);
 
-        // Parse the response using our TrackInfo DTOs
         TrackInfoResponse infoResponse = objectMapper.readValue(jsonResponse, TrackInfoResponse.class);
 
         if (infoResponse != null && infoResponse.track != null) {
             return infoResponse.track.playcount;
         }
-        return 0; // Return 0 if playcount is not found
+        return 0;
     }
 
-    /**
-     * A helper method to send an HTTP request and return the body as a String.
-     */
     private String sendRequest(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

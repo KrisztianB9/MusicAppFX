@@ -15,7 +15,7 @@ import java.io.IOException;
 public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        // Make sure this path is correct for your project structure!
+
         FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("/ro/umfst/oop/musicapp/hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("Music Toplist");

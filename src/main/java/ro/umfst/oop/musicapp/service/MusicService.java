@@ -1,10 +1,9 @@
 package ro.umfst.oop.musicapp.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.umfst.oop.musicapp.DTO.*;
 import ro.umfst.oop.musicapp.model.Song;
+import ro.umfst.oop.musicapp.model.Source;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -53,12 +52,13 @@ public class MusicService {
                 for (Track track : apiResponse.getTracks().getTrackList()) {
                     try {
                         long playCount = fetchPlayCount(track.getArtist().getName(), track.getName());
-
+                        Source songSource = new Source("Last.fm", "International");
                         songList.add(new Song(
                                 track.getName(),
                                 track.getArtist().getName(),
                                 genre,
-                                playCount
+                                playCount,
+                                songSource
                         ));
                     } catch (Exception e) {
                         System.err.println("Hiba a(z) '" + track.getName() + "' dal adatainak lekérésekor: " + e.getMessage());

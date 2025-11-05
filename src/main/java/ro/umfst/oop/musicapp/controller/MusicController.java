@@ -1,6 +1,5 @@
 package ro.umfst.oop.musicapp.controller;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -17,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import ro.umfst.oop.musicapp.model.Song;
+import ro.umfst.oop.musicapp.model.Source;
 import ro.umfst.oop.musicapp.service.MusicService;
 
 import java.util.List;
@@ -38,6 +38,7 @@ public class MusicController {
 
         this.musicService = new MusicService();
     }
+
     // betolti a choiceboxot, listener a kivalasztott mufaj eszrevetelere
     @FXML
     public void initialize() {
@@ -54,6 +55,8 @@ public class MusicController {
                 }
         );
     }
+
+
     // betolti az api-tol kapott zeneket, sorba allitja oket. Threaden indul, hogy ne fagyjon be a gui
     private void loadGenreSongs(String genre) {
         songHBox.getChildren().clear();
@@ -150,7 +153,16 @@ public class MusicController {
         plays.setFont(Font.font("System", 10));
         plays.setStyle("-fx-text-fill: #666666;");
 
-        card.getChildren().addAll(title, artist, plays);
+        // uj source egy labelben
+        Source source1 = song.getSource();
+
+        String sourceText = source1.getProvider() + " (" + source1.getCountry() + ")";
+        Label sourceLabel = new Label(sourceText);
+
+        sourceLabel.setFont(Font.font("System", 10));
+        sourceLabel.setStyle("-fx-text-fill: #888888; -fx-font-style: italic;");
+
+        card.getChildren().addAll(title, artist, plays, sourceLabel);
         return card;
     }
 }

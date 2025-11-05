@@ -20,7 +20,7 @@ import ro.umfst.oop.musicapp.model.Song;
 import ro.umfst.oop.musicapp.service.MusicService;
 
 import java.util.List;
-
+// osztaly a giu inicializalasara
 public class MusicController {
 
     @FXML
@@ -35,9 +35,10 @@ public class MusicController {
     private MusicService musicService;
 
     public MusicController() {
+
         this.musicService = new MusicService();
     }
-
+    // betolti a choiceboxot, listener a kivalasztott mufaj eszrevetelere
     @FXML
     public void initialize() {
         genreChoiceBox.getItems().addAll("rnb", "rock", "hip-hop", "jazz", "80s");
@@ -53,7 +54,7 @@ public class MusicController {
                 }
         );
     }
-
+    // betolti az api-tol kapott zeneket, sorba allitja oket. Threaden indul, hogy ne fagyjon be a gui
     private void loadGenreSongs(String genre) {
         songHBox.getChildren().clear();
         songHBox.setPadding(new Insets(10));
@@ -106,7 +107,7 @@ public class MusicController {
 
         new Thread(fetchTask).start();
     }
-
+    // 3 kartya a HBox-ban a guiban, amiben a zenek tulajdonsagai vannak
     private VBox createSongCard(Song song, String backgroundColor) {
         VBox card = new VBox(5);
         card.setPrefWidth(180);
@@ -136,7 +137,7 @@ public class MusicController {
                 card.setStyle(baseStyle);
             }
         });
-
+        // zene infok
         Label title = new Label(song.getTitle());
         title.setFont(Font.font("System", FontWeight.BOLD, 14));
         title.setWrapText(true);

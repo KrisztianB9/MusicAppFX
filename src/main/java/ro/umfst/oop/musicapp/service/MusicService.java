@@ -14,12 +14,12 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+
+// API hivasert felelos osztaly
 public class MusicService {
-
+    // konstansok az api kulcsal es url-el
     private static final String API_KEY = "1500f7f6f11eff90b85c5635100f0fb6";
     private static final String BASE_URL = "http://ws.audioscrobbler.com/2.0/";
 
@@ -36,7 +36,7 @@ public class MusicService {
 
         return allSongs;
     }
-
+    // kiegesziti az url-t, lekeri az api-tol az infokat
     public List<Song> fetchSongsByGenre(String genre) {
         List<Song> songList = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class MusicService {
             String jsonResponse = sendRequest(url);
 
             ApiResponse apiResponse = objectMapper.readValue(jsonResponse, ApiResponse.class);
-
+            // megnezi ha kapott infot, lementi egy listaba
             if (apiResponse != null && apiResponse.getTracks() != null) {
                 for (Track track : apiResponse.getTracks().getTrackList()) {
                     try {
@@ -70,7 +70,7 @@ public class MusicService {
         }
         return songList;
     }
-
+    // uj api hivas, ami minden zenere kulon lekeri a streamcountot
     private long fetchPlayCount(String artist, String trackName) throws Exception {
 
         String encodedArtist = URLEncoder.encode(artist, StandardCharsets.UTF_8);
@@ -88,7 +88,7 @@ public class MusicService {
         }
         return 0;
     }
-
+    // seged metodus a request kuldesere
     private String sendRequest(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

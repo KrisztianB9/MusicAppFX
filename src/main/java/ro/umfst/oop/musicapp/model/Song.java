@@ -1,5 +1,5 @@
 package ro.umfst.oop.musicapp.model;
-
+//valasz strukturaja
 public class Song {
     private final String title;
     private final String artist;

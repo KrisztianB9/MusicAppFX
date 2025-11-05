@@ -2,7 +2,7 @@ package ro.umfst.oop.musicapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+// json parsing
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiResponse {
     @JsonProperty("tracks")
